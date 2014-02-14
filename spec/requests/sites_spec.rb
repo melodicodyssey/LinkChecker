@@ -60,23 +60,63 @@ describe "Sites" do
 
 	end
 
+	# my tests:
+
 	describe "GET /sites/:id/edit" do
-		it 'is successful with HTML'
-		it 'is a 404 with JSON'
+		before do
+			@site = Site.create!(:url => "test-site-haha.com")
+		end
+		it 'is successful with HTML' do
+			get "/sites/#{@site.id}/edit.html"
+			response.code.should == "200"
+		end
+		it 'is a 404 with JSON' do
+			get "/sites/#{@site.id}/edit.json"
+			response.code.should == "404"
+		end
 	end
 
 	describe "GET /sites/new" do
-		it 'is successful with HTML'
-		it 'is a 404 with JSON'
+		before do
+			@site = Site.create!(:url => "test-site-haha.com")
+		end
+		it 'is successful with HTML' do
+			get '/sites/new.html'
+			response.code.should == "200"
+		end
+		it 'is a 404 with JSON' do
+			get "/sites/new.json"
+			response.code.should == "404"
+	end
 	end
 
 	describe "GET /linkfarm/" do
-		it 'gets the links with HTML'
-		it 'gets the links with JSON'
+		before do
+			@site = Site.create!(:url => "test-site-haha.com")
+		end
+		it 'gets the links with HTML' do
+			get '/linkfarm.html'
+			response.code.should == "200"
+		end
+		it 'gets the links with JSON' do
+			get '/linkfarm.json'
+			response.should be_success
+		end
 	end
 
 	describe "DELETE /sites/:id" do
-		it 'succeeds and redirects with HTML'
-		it 'succeeds and does not redirect with JSON'
+		before do
+			@site = Site.create!(:url => "test-site-haha.com")
+		end
+		it 'succeeds and redirects with HTML' do
+			delete "/sites/#{@site.id}.html"
+			expect {Site.find(@site.id)}.to raise_error ActiveRecord::RecordNotFound
+			response.code.should >= "300" && response.code.should < "400"
+		end
+		it 'succeeds and does not redirect with JSON' do
+			delete "/sites/#{@site.id}.json"
+			expect {Site.find(@site.id)}.to raise_error ActiveRecord::RecordNotFound
+			response.code.should_not >= "300" && response.code.should_not < "400"
+		end
 	end
 end

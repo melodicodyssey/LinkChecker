@@ -1,6 +1,10 @@
 class SitesController < ApplicationController
   def new
     @site = Site.new
+    respond_to do |f|
+      f.html
+      f.json {render :json => {:error => "NOPE"}, :status => 404}
+    end
   end
 
   def create
@@ -19,11 +23,40 @@ class SitesController < ApplicationController
     @links = @site.links
     respond_to do |f|
       f.html
-      f.json { render :json => @site }
+      f.json { render :json => @site, :include => :links }
+    end
+  end
+
+  def edit
+    site = Site.find(params[:id])
+    respond_to do |f|
+      f.html
+      f.json {render :json => {:error => "NOPE"}, :status => 404}
+    end
+  end
+
+  def delete
+    site = Site.find(params[:id])
+    site.delete
+    respond_to do |f|
+      f.html do
+        redirect_to new_site_path
+      end
+      f.json {render :json => site}
     end
   end
 
   def linkfarm
+    links = [
+              {link: "https://www.yahoo.com", comment: "A Search Engine"},
+              {link: "https://www.google.com", comment: "Another Search Engine"},
+              {link: "https://www.amazon.com/testing/testing/testing", comment: "A Made Up Amazon URL"},
+              {link: "https://www.google.com/mysite/that/doesnt/exist", comment: "A Search Engine with a bad link"}
+            ]
+    respond_to do |f|
+      f.html {render :linkfarm}
+      f.json {render :json => links}
+    end
   end
 
   rescue_from ActionController::ParameterMissing, :only => :create do |err|
